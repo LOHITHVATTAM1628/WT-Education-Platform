@@ -3,6 +3,9 @@
 A modern, responsive, and interactive educational platform web application built using **HTML5**, **CSS3**, and **Vanilla JavaScript** with **zero backend dependencies**.
 
 ---
+<img width="1915" height="828" alt="Screenshot 2026-09-14 172244" src="https://github.com/user-attachments/assets/bc3f2067-1633-4293-a81d-c8537c2ea52e" />
+<img width="1897" height="822" alt="Screenshot 2026-09-14 172256" src="https://github.com/user-attachments/assets/4b85a013-f998-47a3-8111-fe7b07db4754" />
+<img width="1885" height="821" alt="image" src="https://github.com/user-attachments/assets/6c9766fe-a696-4e9e-8aa7-b2cc1bbdbe7f" />
 
 ## 🌟 Features
 
