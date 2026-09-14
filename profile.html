@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EduLearn - Student Academic Profile and Learning Analytics">
+    <title>EduLearn | Student Profile</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Instant Dark Mode Initialization (Prevents Page Load Flash / FOUC) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem("theme") || localStorage.getItem("edulearn_theme");
+            if (savedTheme === "dark") {
+                document.documentElement.classList.add("dark-theme", "dark-mode");
+            }
+        })();
+    </script>
+
+    <!-- Global Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="profile-page">
+    <!-- Dynamic Moving Neural Network Canvas Background -->
+    <canvas id="neural-bg-canvas" class="neural-bg-canvas neural-canvas" aria-hidden="true"></canvas>
+
+    <!-- ====================================================================
+         1. REUSABLE NAVIGATION BAR COMPONENT
+         ==================================================================== -->
+    <nav class="navbar" aria-label="Main Navigation">
+        <div class="navbar-container">
+            
+            <!-- Brand Logo -->
+            <a href="dashboard.html" class="nav-brand">
+                <div class="nav-brand-logo" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                </div>
+                <span class="nav-brand-name">Edu<span>Learn</span></span>
+            </a>
+
+            <!-- Mobile Navigation Toggle -->
+            <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle navigation menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <!-- Navigation Links -->
+            <ul class="nav-menu" id="nav-menu">
+                <li>
+                    <a href="dashboard.html" class="nav-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="courses.html" class="nav-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <span>Courses</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="profile.html" class="nav-link active" aria-current="page">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span>Profile</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Nav Actions: Theme Toggle, User Chip & Logout Button -->
+            <div class="nav-actions">
+                <button id="theme-toggle-btn" class="btn-theme-toggle" aria-label="Toggle dark mode" title="Switch Theme">
+                    <span class="theme-icon" id="theme-icon">🌙</span>
+                </button>
+                <div class="user-chip">
+                    <div class="user-avatar" id="user-initial">S</div>
+                    <span class="user-name" id="user-display-name">Student</span>
+                </div>
+                <button id="logout-btn" class="btn-logout" title="Sign out of EduLearn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Logout</span>
+                </button>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- ====================================================================
+         2. PROFILE MAIN CONTENT
+         ==================================================================== -->
+    <main class="profile-container-main">
+        
+        <!-- Breadcrumbs Navigation -->
+        <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+            <a href="dashboard.html" class="breadcrumb-link">Home</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Student Academic Profile</span>
+        </nav>
+
+        <!-- Profile Hero Card -->
+        <header class="profile-hero-card">
+            <div class="profile-user-left">
+                <div class="profile-avatar-giant" id="profile-avatar-initial">S</div>
+                <div class="profile-info-text">
+                    <h1 id="profile-full-name">Student</h1>
+                    <div class="profile-username-tag" id="profile-username-handle">@student</div>
+                    <div class="profile-badges-row">
+                        <span class="profile-badge">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path></svg>
+                            Enrolled Student
+                        </span>
+                        <span class="profile-badge">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                            Academic Year 2026
+                        </span>
+                        <span class="badge-difficulty badge-beginner">Status: Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Actions (Viva Reset Helper) -->
+            <div class="profile-actions-right">
+                <button type="button" class="btn-reset-data" id="btn-reset-profile-data" title="Reset progress and quiz scores back to initial state">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="1 4 1 10 7 10"></polyline>
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                    </svg>
+                    <span>Reset Demo Data</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ====================================================================
+             3. AGGREGATED METRICS GRID (Calculated from localStorage)
+             ==================================================================== -->
+        <section class="metrics-section" aria-labelledby="profile-analytics-heading">
+            <div class="section-header">
+                <h2 id="profile-analytics-heading" class="section-title">Aggregate Academic Performance</h2>
+            </div>
+
+            <div class="metrics-grid">
+                
+                <!-- Metric 1: Total Enrolled -->
+                <article class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Enrolled Courses</span>
+                        <div class="metric-icon-box metric-icon-blue">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="metric-value-row">
+                        <span class="metric-value" id="profile-total-courses">4</span>
+                        <span class="metric-subtitle">Active Curriculum</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: 100%;"></div>
+                        </div>
+                        <div class="progress-meta">
+                            <span>Enrollment</span>
+                            <span>Full Access</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Metric 2: Lessons Completed -->
+                <article class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Completed Lessons</span>
+                        <div class="metric-icon-box metric-icon-amber">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="metric-value-row">
+                        <span class="metric-value" id="profile-completed-lessons">0</span>
+                        <span class="metric-subtitle" id="profile-total-lessons-ratio">/ 20 Lessons</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-track">
+                            <div class="progress-fill progress-fill-amber" id="profile-lessons-bar" style="width: 0%;"></div>
+                        </div>
+                        <div class="progress-meta">
+                            <span>Curriculum Pace</span>
+                            <span id="profile-lessons-remaining">0 Remaining</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Metric 3: Overall Progress -->
+                <article class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Overall Progress</span>
+                        <div class="metric-icon-box metric-icon-green">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="metric-value-row">
+                        <span class="metric-value" id="profile-overall-progress">0%</span>
+                        <span class="metric-subtitle">Syllabus Completion</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-track">
+                            <div class="progress-fill progress-fill-success" id="profile-progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <div class="progress-meta">
+                            <span>Syllabus Target</span>
+                            <span>100% Target</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Metric 4: Average Quiz Score -->
+                <article class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Average Quiz Score</span>
+                        <div class="metric-icon-box metric-icon-purple">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="7"></circle>
+                                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="metric-value-row">
+                        <span class="metric-value" id="profile-avg-quiz-score">0%</span>
+                        <span class="metric-subtitle">Assessment Grade</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-track">
+                            <div class="progress-fill" id="profile-quiz-bar" style="width: 0%; background: linear-gradient(90deg, #7c3aed, #a855f7);"></div>
+                        </div>
+                        <div class="progress-meta">
+                            <span>Total Assessments</span>
+                            <span id="profile-quizzes-count">4 Quizzes</span>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- ====================================================================
+             4. COURSE-BY-COURSE BREAKDOWN & PERFORMANCE LIST
+             ==================================================================== -->
+        <section class="breakdown-section" aria-labelledby="breakdown-heading">
+            <div class="section-header">
+                <h2 id="breakdown-heading" class="section-title">Individual Course Breakdown</h2>
+            </div>
+
+            <!-- Dynamic Course Breakdown Grid (Populated by JavaScript) -->
+            <div class="breakdown-grid" id="course-breakdown-container">
+                <!-- Injected Dynamically by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Viva Helper Note -->
+        <div class="viva-helper-box" style="margin-top: 2rem;">
+            <div class="viva-helper-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Viva Concept: Holistic Client-Side Data Aggregation</span>
+            </div>
+            <p>The Profile module traverses all 4 courses, computes completed lesson sets from <code>localStorage.getItem("edulearn_course_progress")</code>, cross-references assessment records from <code>localStorage.getItem("edulearn_quiz_scores")</code>, and synthesizes individual and overall performance summaries completely without a backend server.</p>
+        </div>
+
+    </main>
+
+    <!-- Canvas Confetti Celebration Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <!-- Global Application & Profile JavaScript -->
+    <script src="js/script.js"></script>
+</body>
+</html>
