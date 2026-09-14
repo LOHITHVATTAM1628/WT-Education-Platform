@@ -656,22 +656,25 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. Execute Authentication Route Guard
     handleAuthGuard();
 
-    // 3. Page-Specific Controller Routing
-    const currentPage = getCurrentPageName();
-    console.log(`Current page route: [${currentPage}]`);
-
-    if (currentPage === "index.html" || currentPage === "") {
-        initLoginPage();
-    } else if (currentPage === "dashboard.html") {
-        initDashboardPage();
-    } else if (currentPage === "courses.html") {
+    // 3. Failsafe Page Controller Routing (DOM element detection works 100% reliably on Netlify, GitHub Pages, Localhost)
+    if (document.getElementById("courses-grid")) {
+        console.log("Detected Courses Catalog Page -> initCoursesPage()");
         initCoursesPage();
-    } else if (currentPage === "course.html") {
+    } else if (document.getElementById("lessons-list-container") || document.getElementById("course-detail-title")) {
+        console.log("Detected Course Detail Page -> initCourseDetailsPage()");
         initCourseDetailsPage();
-    } else if (currentPage === "quiz.html") {
+    } else if (document.getElementById("questions-container") || document.getElementById("quiz-form")) {
+        console.log("Detected Quiz Page -> initQuizPage()");
         initQuizPage();
-    } else if (currentPage === "profile.html") {
+    } else if (document.getElementById("course-breakdown-container") || document.getElementById("profile-full-name")) {
+        console.log("Detected Profile Page -> initProfilePage()");
         initProfilePage();
+    } else if (document.getElementById("welcome-username") || document.getElementById("stat-enrolled-courses")) {
+        console.log("Detected Dashboard Page -> initDashboardPage()");
+        initDashboardPage();
+    } else if (document.getElementById("login-form")) {
+        console.log("Detected Login Page -> initLoginPage()");
+        initLoginPage();
     }
 
     // 4. Setup global navbar, mobile drawer, and logout listeners
@@ -765,13 +768,13 @@ function attachThemeToggleListeners() {
  * Function: handleAuthGuard
  * Viva Explanation:
  * Intercepts page load to verify if user holds an active session flag in localStorage.
- * Unauthenticated users trying to access protected pages are kicked to index.html.
+ * Unauthenticated users trying to access protected pages are redirected to index.html.
  * Authenticated users visiting index.html are auto-forwarded to dashboard.html.
  */
 function handleAuthGuard() {
     const isLoggedIn = localStorage.getItem(APP_CONFIG.STORAGE_KEYS.IS_LOGGED_IN) === "true";
-    const currentPage = getCurrentPageName();
-    const isPublicPage = currentPage === "index.html" || currentPage === "";
+    const currentPage = getCurrentPageName().toLowerCase();
+    const isPublicPage = currentPage === "index.html" || document.getElementById("login-form") !== null;
 
     if (!isLoggedIn && !isPublicPage) {
         console.warn("Unauthorized access. Redirecting to login page...");
@@ -784,8 +787,10 @@ function handleAuthGuard() {
 
 function getCurrentPageName() {
     const path = window.location.pathname;
-    const page = path.substring(path.lastIndexOf('/') + 1);
-    return page || "index.html";
+    let page = path.substring(path.lastIndexOf('/') + 1).split('?')[0].split('#')[0];
+    if (!page || page === "") return "index.html";
+    if (!page.includes(".")) page = `${page}.html`;
+    return page;
 }
 
 // ==============================================================================
@@ -1180,12 +1185,11 @@ let currentActiveLessonNumber = null;
 function initCourseDetailsPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get("id");
-    const currentCourse = APP_CONFIG.COURSES.find(c => c.id === courseId);
+    let currentCourse = APP_CONFIG.COURSES.find(c => c.id === courseId);
 
+    // Safe fallback if course id is not in URL or invalid
     if (!currentCourse) {
-        alert("Course not found! Redirecting to available courses.");
-        window.location.href = APP_CONFIG.PAGES.COURSES;
-        return;
+        currentCourse = APP_CONFIG.COURSES[0];
     }
 
     currentActiveCourse = currentCourse;
@@ -1580,12 +1584,11 @@ function escapeHTML(str) {
 function initQuizPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get("id");
-    const currentCourse = APP_CONFIG.COURSES.find(c => c.id === courseId);
+    let currentCourse = APP_CONFIG.COURSES.find(c => c.id === courseId);
 
+    // Safe fallback if course quiz not found
     if (!currentCourse || !currentCourse.quiz) {
-        alert("Quiz not found for this course! Redirecting to courses catalog.");
-        window.location.href = APP_CONFIG.PAGES.COURSES;
-        return;
+        currentCourse = APP_CONFIG.COURSES[0];
     }
 
     document.title = `Quiz: ${currentCourse.title} | EduLearn`;
